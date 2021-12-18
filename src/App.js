@@ -1,92 +1,82 @@
-import * as React from 'react';
-import {View, Text, TouchableHighlight} from 'react-native';
+import React, {useState, useEffect, useReducer} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import Auth from './page/Auth';
+import Login from './page/Login';
+import SignUp from './page/SignUp';
+import Home from './page/Home';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AuthContext} from './context/AuthContext';
 
 const Stack = createNativeStackNavigator();
 
-const Welcome = ({navigation}) => {
-  return (
-    <View
-      style={{
-        display: 'flex',
-        flex: 1,
-        justifyContent: 'flex-end',
-        paddingHorizontal: 16,
-      }}>
-      <View style={{marginBottom: 16}}>
-        <Text
-          style={{
-            fontSize: 18,
-            fontWeight: 'normal',
-            color: 'black',
-            textAlign: 'center',
-            marginBottom: 40,
-          }}>
-          Training App
-        </Text>
-        <TouchableHighlight
-          style={{backgroundColor: '#1644BD', padding: 12, marginBottom: 16}}
-          onPress={() => navigation.navigate('SignUp')}>
-          <Text style={{color: 'white', textAlign: 'center'}}>Register</Text>
-        </TouchableHighlight>
-        <TouchableHighlight
-          style={{
-            borderColor: '#1644BD',
-            borderStyle: 'solid',
-            borderWidth: 1,
-            padding: 12,
-            marginBottom: 16,
-          }}
-          onPress={() => navigation.navigate('Login')}>
-          <Text style={{color: '#1644BD', textAlign: 'center'}}>Login</Text>
-        </TouchableHighlight>
-      </View>
-    </View>
-  );
-};
-
-const SignUp = ({navigation}) => {
-  return (
-    <View>
-      <TouchableHighlight onPress={() => navigation.navigate('Welcome')}>
-        <Text>Sign Up</Text>
-      </TouchableHighlight>
-    </View>
-  );
-};
-
-const Login = ({navigation}) => {
-  return (
-    <View>
-      <TouchableHighlight onPress={() => navigation.navigate('Welcome')}>
-        <Text>Login</Text>
-      </TouchableHighlight>
-    </View>
-  );
-};
-
 const App = () => {
+  const authInitState = {
+    token: null,
+  };
+
+  const authReducer = (state, action) => {
+    switch (action.type) {
+      case 'RESTORE_TOKEN':
+        return {...state, token: action.token};
+      case 'LOGIN':
+        return {...state, token: action.token};
+      case 'SIGN_UP':
+        return {...state, token: action.token};
+      case 'LOGOUT':
+        return {...state, token: null};
+      default:
+        return state;
+    }
+  };
+
+  const [state, dispatch] = useReducer(authReducer, authInitState);
+  const getToken = () => {
+    AsyncStorage.getItem('TOKEN').then(res => {
+      console.log(res);
+      if (res) {
+        dispatch({type: 'RESTORE_TOKEN', token: res});
+      }
+    });
+  };
+
+  useEffect(() => {
+    getToken();
+  }, []);
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Welcome"
-          component={Welcome}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="SignUp"
-          component={SignUp}
-          options={{title: 'SignUp'}}
-        />
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{title: 'Login'}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthContext.Provider value={[state, dispatch]}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          {state.token == null ? (
+            <>
+              <Stack.Screen
+                name="Auth"
+                component={Auth}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="SignUp"
+                component={SignUp}
+                options={{title: 'SignUp'}}
+              />
+              <Stack.Screen
+                name="Login"
+                component={Login}
+                options={{title: 'Login'}}
+              />
+            </>
+          ) : (
+            <Stack.Screen
+              name="Home"
+              component={Home}
+              options={{headerShown: false}}
+            />
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
 };
+
 export default App;
