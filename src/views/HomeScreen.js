@@ -1,9 +1,9 @@
 import React, {useContext} from 'react';
 import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {AuthContext} from '../../context/AuthContext';
+import {AuthContext} from '../context/AuthContext';
 
-const Home = ({navigation}) => {
+const HomeScreen = ({navigation}) => {
   const [state, dispatch] = useContext(AuthContext);
   const handleLogout = () => {
     AsyncStorage.removeItem('TOKEN').then(() => {
@@ -21,7 +21,7 @@ const Home = ({navigation}) => {
   );
 };
 
-export default Home;
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   wrapper: {

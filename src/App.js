@@ -1,39 +1,35 @@
-import React, {useState, useEffect, useReducer} from 'react';
+import React, {useEffect, useReducer} from 'react';
+import {Button, Text} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Auth from './page/Auth';
-import Login from './page/Login';
-import SignUp from './page/SignUp';
-import Home from './page/Home';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {AuthContext} from './context/AuthContext';
+import {AuthContext} from './context';
+import {
+  AuthScreen,
+  FeedScreen,
+  HomeScreen,
+  LoginScreen,
+  MessageScreen,
+  MyPageScreen,
+  ProfileScreen,
+  SignUpScreen,
+} from './views';
+import {AuthReducer} from './reducers';
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
 const App = () => {
-  const authInitState = {
-    token: null,
+  const [state, dispatch] = useReducer(AuthReducer, {token: null});
+  const handleLogout = () => {
+    AsyncStorage.removeItem('TOKEN').then(() => {
+      dispatch({type: 'LOGOUT'});
+    });
   };
-
-  const authReducer = (state, action) => {
-    switch (action.type) {
-      case 'RESTORE_TOKEN':
-        return {...state, token: action.token};
-      case 'LOGIN':
-        return {...state, token: action.token};
-      case 'SIGN_UP':
-        return {...state, token: action.token};
-      case 'LOGOUT':
-        return {...state, token: null};
-      default:
-        return state;
-    }
-  };
-
-  const [state, dispatch] = useReducer(authReducer, authInitState);
   const getToken = () => {
     AsyncStorage.getItem('TOKEN').then(res => {
-      console.log(res);
+      // console.log(res);
       if (res) {
         dispatch({type: 'RESTORE_TOKEN', token: res});
       }
@@ -44,6 +40,50 @@ const App = () => {
     getToken();
   }, []);
 
+  const HomeNavigator = () => {
+    return (
+      <Tab.Navigator
+        screenOptions={({route}) => {
+          if (route.name == route.name) {
+            console.log(route.name);
+            iconName = focused;
+          } else if (route.name === 'Feed') {
+            iconName = focused ? 'ios-list-box' : 'ios-list';
+          }
+        }}>
+        <Tab.Screen
+          name="FeedScreen"
+          options={{title: 'TrainingApps', headerTitleAlign: 'center'}}
+          component={FeedScreen}
+        />
+        <Tab.Screen
+          name="MessageScreen"
+          options={{title: 'TrainingApps', headerTitleAlign: 'center'}}
+          component={MessageScreen}
+        />
+        <Tab.Screen
+          name="MyPageScreen"
+          options={{
+            title: 'MyPageScreen',
+            headerTitleAlign: 'center',
+            headerRight: () => (
+              <Text
+                onPress={() => handleLogout()}
+                style={{
+                  paddingRight: 16,
+                  color: '#1644BD',
+                  fontWeight: 'bold',
+                }}>
+                Logout
+              </Text>
+            ),
+          }}
+          component={MyPageScreen}
+        />
+      </Tab.Navigator>
+    );
+  };
+
   return (
     <AuthContext.Provider value={[state, dispatch]}>
       <NavigationContainer>
@@ -51,25 +91,25 @@ const App = () => {
           {state.token == null ? (
             <>
               <Stack.Screen
-                name="Auth"
-                component={Auth}
+                name="AuthScreen"
+                component={AuthScreen}
                 options={{headerShown: false}}
               />
               <Stack.Screen
-                name="SignUp"
-                component={SignUp}
+                name="SignUpScreen"
+                component={SignUpScreen}
                 options={{title: 'SignUp'}}
               />
               <Stack.Screen
-                name="Login"
-                component={Login}
+                name="LoginScreen"
+                component={LoginScreen}
                 options={{title: 'Login'}}
               />
             </>
           ) : (
             <Stack.Screen
-              name="Home"
-              component={Home}
+              name="HomeScreen"
+              component={HomeNavigator}
               options={{headerShown: false}}
             />
           )}

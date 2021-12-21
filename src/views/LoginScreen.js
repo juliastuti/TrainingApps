@@ -1,49 +1,25 @@
-import React, {state, useContext, useState} from 'react';
 import axios from 'axios';
+import React, {useContext, useState} from 'react';
 import {
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  StyleSheet,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {AuthContext} from '../../context/AuthContext';
+import {AuthContext} from '../context/AuthContext';
 
-const SignUp = ({navigation}) => {
+const LoginScreen = ({navigation}) => {
   const [form, setForm] = useState({
-    nickname: '',
     email: '',
     password: '',
-    language: '',
-    isValidNickname: true,
     isValidEmail: true,
     isValidPassword: true,
-    isValidLanguage: true,
     secureTextEntry: true,
-    nicknameValidation: '',
     emailValidation: '',
     passwordValidation: '',
-    languageValidation: '',
   });
-
-  const handleNicknameValidation = val => {
-    if (!val) {
-      setForm({
-        ...form,
-        isValidNickname: false,
-        nicknameValidation: 'Nickname required',
-      });
-    } else if (val.length >= 20) {
-      setForm({
-        ...form,
-        isValidNickname: false,
-        nicknameValidation: 'Nickname cant more than 20',
-      });
-    } else {
-      setForm({...form, isValidNickname: true, nicknameValidation: ''});
-    }
-  };
 
   const handleEmailValidation = val => {
     if (!val) {
@@ -87,32 +63,14 @@ const SignUp = ({navigation}) => {
     }
   };
 
-  const handleLanguageValidation = val => {
-    if (!val) {
-      setForm({
-        ...form,
-        isValidLanguage: false,
-        languageValidation: 'Language required',
-      });
-    } else if (val.length > 2) {
-      setForm({
-        ...form,
-        isValidLanguage: false,
-        languageValidation: 'Language cant more than 2',
-      });
-    } else {
-      setForm({...form, isValidLanguage: true, languageValidation: ''});
-    }
-  };
-
   const [state, dispatch] = useContext(AuthContext);
-  const handleSignUp = async () => {
-    const url = `https://terraresta.com/app/api/SignUpCtrl/SignUp?login_id=${form.email}&password=${form.password}&nickname=${form.nickname}&language=${form.language}`;
+  const handleLogin = async () => {
+    const url = `http://terraresta.com/app/api/LoginCtrl/Login?login_id=${form.email}&password=${form.password}&language=${form.language}`;
     axios.get(url).then(result => {
       if (result.data.status == 1) {
-        console.log(result.data);
+        // console.log(result.data);
         AsyncStorage.setItem('TOKEN', result.data.accessToken).then(() => {
-          dispatch({type: 'SIGN_UP', token: result.data.accessToken});
+          dispatch({type: 'LOGIN', token: result.data.accessToken});
         });
       } else {
         alert(result.data.error.errorMessage);
@@ -122,18 +80,7 @@ const SignUp = ({navigation}) => {
 
   return (
     <View style={styles.wrapper}>
-      <View style={styles.form}>
-        <View style={styles.input_wrapper}>
-          <Text style={styles.label}>Nickname</Text>
-          <TextInput
-            onChangeText={val => setForm({...form, nickname: val})}
-            onEndEditing={e => handleNicknameValidation(e.nativeEvent.text)}
-            style={styles.input}
-          />
-          {form.isValidNickname ? null : (
-            <Text style={styles.validation}>{form.nicknameValidation}</Text>
-          )}
-        </View>
+      <View style={styles.form_wrapper}>
         <View style={styles.input_wrapper}>
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -157,33 +104,18 @@ const SignUp = ({navigation}) => {
             <Text style={styles.validation}>{form.passwordValidation}</Text>
           )}
         </View>
-        <View style={styles.input_wrapper}>
-          <Text style={styles.label}>Language</Text>
-          <TextInput
-            onChangeText={val => setForm({...form, language: val})}
-            onEndEditing={e => handleLanguageValidation(e.nativeEvent.text)}
-            style={styles.input}
-          />
-          {form.isValidLanguage ? null : (
-            <Text style={styles.validation}>{form.languageValidation}</Text>
-          )}
-        </View>
       </View>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => handleSignUp()}
-        disabled={
-          !form.nickname || !form.email || !form.password || !form.language
-            ? true
-            : false
-        }>
-        <Text style={{color: 'white', textAlign: 'center'}}>Sign Up</Text>
+        onPress={() => handleLogin()}
+        disabled={!form.email || !form.password ? true : false}>
+        <Text style={{color: 'white', textAlign: 'center'}}>Login</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-export default SignUp;
+export default LoginScreen;
 
 const styles = StyleSheet.create({
   wrapper: {

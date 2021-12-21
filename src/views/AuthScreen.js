@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 
-export default function Auth({navigation}) {
+export default function AuthScreen({navigation}) {
   return (
     <View
       style={{
@@ -23,7 +23,7 @@ export default function Auth({navigation}) {
         </Text>
         <TouchableOpacity
           style={{backgroundColor: '#1644BD', padding: 12, marginBottom: 16}}
-          onPress={() => navigation.navigate('SignUp')}>
+          onPress={() => navigation.navigate('SignUpScreen')}>
           <Text style={{color: 'white', textAlign: 'center'}}>Register</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -34,7 +34,7 @@ export default function Auth({navigation}) {
             padding: 12,
             marginBottom: 16,
           }}
-          onPress={() => navigation.navigate('Login')}>
+          onPress={() => navigation.navigate('LoginScreen')}>
           <Text style={{color: '#1644BD', textAlign: 'center'}}>Login</Text>
         </TouchableOpacity>
       </View>
