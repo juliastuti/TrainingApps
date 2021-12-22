@@ -68,9 +68,16 @@ const LoginScreen = ({navigation}) => {
     const url = `http://terraresta.com/app/api/LoginCtrl/Login?login_id=${form.email}&password=${form.password}&language=${form.language}`;
     axios.get(url).then(result => {
       if (result.data.status == 1) {
-        // console.log(result.data);
-        AsyncStorage.setItem('TOKEN', result.data.accessToken).then(() => {
-          dispatch({type: 'LOGIN', token: result.data.accessToken});
+        const user = {
+          token: result.data.accessToken,
+          userId: result.data.userId,
+        };
+        AsyncStorage.setItem('USER', JSON.stringify(user)).then(() => {
+          dispatch({
+            type: 'LOGIN',
+            token: result.data.accessToken,
+            userId: result.data.userId,
+          });
         });
       } else {
         alert(result.data.error.errorMessage);

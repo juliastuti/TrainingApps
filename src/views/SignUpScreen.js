@@ -110,9 +110,16 @@ const SignUpScreen = ({navigation}) => {
     const url = `https://terraresta.com/app/api/SignUpCtrl/SignUp?login_id=${form.email}&password=${form.password}&nickname=${form.nickname}&language=${form.language}`;
     axios.get(url).then(result => {
       if (result.data.status == 1) {
-        // console.log(result.data);
-        AsyncStorage.setItem('TOKEN', result.data.accessToken).then(() => {
-          dispatch({type: 'SIGN_UP', token: result.data.accessToken});
+        const user = {
+          token: result.data.accessToken,
+          userId: result.data.userId,
+        };
+        AsyncStorage.setItem('USER', JSON.stringify(user)).then(() => {
+          dispatch({
+            type: 'SIGN_UP',
+            token: result.data.accessToken,
+            userId: result.data.userId,
+          });
         });
       } else {
         alert(result.data.error.errorMessage);

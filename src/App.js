@@ -12,7 +12,6 @@ import {
   LoginScreen,
   MessageScreen,
   MyPageScreen,
-  ProfileScreen,
   SignUpScreen,
 } from './views';
 import {AuthReducer} from './reducers';
@@ -42,15 +41,7 @@ const App = () => {
 
   const HomeNavigator = () => {
     return (
-      <Tab.Navigator
-        screenOptions={({route}) => {
-          if (route.name == route.name) {
-            console.log(route.name);
-            iconName = focused;
-          } else if (route.name === 'Feed') {
-            iconName = focused ? 'ios-list-box' : 'ios-list';
-          }
-        }}>
+      <Tab.Navigator>
         <Tab.Screen
           name="FeedScreen"
           options={{title: 'TrainingApps', headerTitleAlign: 'center'}}
