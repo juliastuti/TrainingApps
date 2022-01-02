@@ -21,17 +21,26 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const App = () => {
-  const [state, dispatch] = useReducer(AuthReducer, {token: null});
+  const [state, dispatch] = useReducer(AuthReducer, {
+    token: null,
+    userId: null,
+  });
+
   const handleLogout = () => {
-    AsyncStorage.removeItem('TOKEN').then(() => {
+    AsyncStorage.removeItem('USER').then(() => {
       dispatch({type: 'LOGOUT'});
     });
   };
+
   const getToken = () => {
-    AsyncStorage.getItem('TOKEN').then(res => {
-      // console.log(res);
+    AsyncStorage.getItem('USER').then(res => {
       if (res) {
-        dispatch({type: 'RESTORE_TOKEN', token: res});
+        const user = JSON.parse(res);
+        dispatch({
+          type: 'RESTORE_TOKEN',
+          token: user.token,
+          userId: user.userId,
+        });
       }
     });
   };
@@ -42,15 +51,7 @@ const App = () => {
 
   const HomeNavigator = () => {
     return (
-      <Tab.Navigator
-        screenOptions={({route}) => {
-          if (route.name == route.name) {
-            console.log(route.name);
-            iconName = focused;
-          } else if (route.name === 'Feed') {
-            iconName = focused ? 'ios-list-box' : 'ios-list';
-          }
-        }}>
+      <Tab.Navigator>
         <Tab.Screen
           name="FeedScreen"
           options={{title: 'TrainingApps', headerTitleAlign: 'center'}}
