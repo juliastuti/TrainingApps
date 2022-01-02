@@ -12,7 +12,6 @@ import {
   LoginScreen,
   MessageScreen,
   MyPageScreen,
-  ProfileScreen,
   SignUpScreen,
 } from './views';
 import {AuthReducer} from './reducers';
